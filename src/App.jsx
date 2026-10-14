@@ -1,86 +1,43 @@
-import { useState } from "react"
+import { useEffect, useState } from "react"
 import "./App.css"
 import ProductCard from "./components/ProductCard"
 import ProductCustomizer from "./components/ProductCustomizer"
+import { supabase } from "./lib/supabase.js"
 
 function App() {
 
   const [selectedProduct, setSelectedProduct] = useState(null)
   const [customizingProduct, setCustomizingProduct] = useState(null)
 
-  const products = [
-    {
-      id: 1,
-      name: "Modelo Aurora",
-      price: 35000,
-      type: "personalizable",
-      category: "Tacones",
-      description:
-        "Diseña este modelo seleccionando el material, color y tipo de suela.",
-      image:
-        "https://images.unsplash.com/photo-1543163521-1bf539c55dd2?auto=format&fit=crop&w=900&q=80"
-    },
+ 
+const [products, setProducts] = useState([])
+const [loadingProducts, setLoadingProducts] = useState(true)
+const [productsError, setProductsError] = useState("")
 
-    {
-      id: 2,
-      name: "Modelo Valentina",
-      price: 28000,
-      type: "personalizable",
-      category: "Sandalias",
-      description:
-        "Personaliza este diseño para crear un calzado único.",
-      image:
-        "https://images.unsplash.com/photo-1562273138-f46be4ebdf33?auto=format&fit=crop&w=900&q=80"
-    },
+useEffect(() => {
+  async function loadProducts() {
+    setLoadingProducts(true)
+    setProductsError("")
 
-    {
-      id: 3,
-      name: "Modelo Roma",
-      price: 25000,
-      type: "no-personalizable",
-      category: "Zapatos",
-      description:
-        "Modelo disponible exactamente como aparece en las fotografías.",
-      image:
-        "https://images.unsplash.com/photo-1542291026-7eec264c27ff?auto=format&fit=crop&w=900&q=80"
-    },
+    const { data, error } = await supabase
+      .from("products")
+      .select("*")
+      .eq("available", true)
+      .order("created_at", { ascending: false })
 
-    {
-      id: 4,
-      name: "Modelo Sofia",
-      price: 32000,
-      type: "personalizable",
-      category: "Tacones",
-      description:
-        "Elige diferentes características para adaptar el modelo a tu estilo.",
-      image:
-        "https://images.unsplash.com/photo-1595950653106-6c9ebd614d3a?auto=format&fit=crop&w=900&q=80"
-    },
-
-    {
-      id: 5,
-      name: "Modelo París",
-      price: 30000,
-      type: "no-personalizable",
-      category: "Sandalias",
-      description:
-        "Diseño disponible tal como se muestra en las fotografías.",
-      image:
-        "https://images.unsplash.com/photo-1603487742131-4160ec999306?auto=format&fit=crop&w=900&q=80"
-    },
-
-    {
-      id: 6,
-      name: "Modelo Atenea",
-      price: 37000,
-      type: "personalizable",
-      category: "Tacones",
-      description:
-        "Crea una versión personalizada escogiendo sus características.",
-      image:
-        "https://images.unsplash.com/photo-1515347619252-60a4bf4fff4f?auto=format&fit=crop&w=900&q=80"
+    if (error) {
+      console.error("Error cargando productos:", error)
+      setProductsError(error.message)
+    } else {
+      setProducts(data ?? [])
     }
-  ]
+
+    setLoadingProducts(false)
+  }
+
+  loadProducts()
+}, [])
+
 
   const personalizables = products.filter(
     product => product.type === "personalizable"
@@ -252,6 +209,21 @@ function App() {
         className="products-section"
         id="catalogo"
       >
+        
+  {loadingProducts && (
+    <p>Cargando nuestros modelos...</p>
+  )}
+
+  {productsError && (
+    <p role="alert">
+      No se pudieron cargar los productos: {productsError}
+    </p>
+  )}
+
+  {!loadingProducts && !productsError && products.length === 0 && (
+    <p>Pronto tendremos modelos disponibles para ti.</p>
+  )}
+
 
         <div className="section-heading">
 

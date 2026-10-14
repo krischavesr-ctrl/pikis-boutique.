@@ -1,0 +1,22 @@
+<!doctype html>
+<html lang="es">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Administración - Piki's Boutique</title>
+  </head>
+
+  <body>
+    <div id="admin-root"></div>
+
+    <script type="module">
+      import React from "react";
+      import { createRoot } from "react-dom/client";
+      import AdminApp from "./src/admin/AdminApp.jsx";
+
+      const root = createRoot(document.getElementById("admin-root"));
+
+      root.render(React.createElement(AdminApp));
+    </script>
+  </body>
+</html>
